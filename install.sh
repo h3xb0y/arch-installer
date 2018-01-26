@@ -43,11 +43,8 @@ preinstall(){
 	color cyan " '+sso+:-'                 '.-/+oso:" >&2
 	color cyan "'++:.                           '-/+/" >&2
 	color cyan ".'                                 '" >&2
-	color deepblue "Welcome to arch-installer, a script maded by h3xb0y :).">&2
-	color deepblue "This script perform an automatic install of Archlinux." >&2
-	color deepblue "Pretty simple, it only ask you for hostname, username," >&2
-	color deepblue "password, which disk to use, required partitions size," >&2
-	color deepblue "language and if you wish or not to install xfce4">&2
+	color deepblue "Welcome to arch-installer v0.1, a script maded by h3xb0y :).">&2
+	color deepblue "https://github.com/h3xb0y/arch-install" >&2
 	color bold "Press ENTER to skip..."
 	read startinstall
 	clear
@@ -80,7 +77,7 @@ preinstall(){
     color bold "HOME mount point:"
     read HOME
     color default "Enter partrition to format:"
-    select type in "boot" "swap" "root" "home" "skip";do
+    select type in "boot" "swap" "root" "home" "start installation";do
             case $type in
                 "boot")
                 	umount $BOOT > /dev/null 2>&1
@@ -98,7 +95,7 @@ preinstall(){
                     umount $HOME > /dev/null 2>&1
         			mkfs.ext4 $HOME -L home
                 ;;
-                "skip")
+                "start installation")
                     break
                 ;;
                 *)
@@ -123,6 +120,7 @@ install(){
 }
 
 sysconfig(){
+	pacman -Syy
 	#INSTALLING GRUB PACKAGE
 	color cyan "Install GRUB? y/n"
     read grub
@@ -133,15 +131,16 @@ sysconfig(){
                 "BIOS")	   
 					color deepblue "installing grub package..."
 					pacman -S --noconfirm grub
-					rub-install --target=i386-pc $TMP
-        			grub-mkconfig -o /boot/grub/grub.cfg
-					break
+					grub-install --root-directory=/mnt /dev/sda
+        			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
                 ;;
                 "EFI")
 					color deepblue "installing grub package..."
                    	pacman -S --noconfirm grub efibootmgr -y
-        			grub-install --target=`uname -m`-efi --efi-directory=/boot --bootloader-id=Arch
-        			grub-mkconfig -o /boot/grub/grub.cfg
+        			grub-install --target='uname -m'-efi --efi-directory=/boot --bootloader-id=Arch
+        			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+        			mkdir /mnt/boot/EFI/boot
+        			cp /mnt/boot/EFI/arch_grub/grubx64.efi /mnt/boot/EFI/boot/bootx64.efi
                     break
                 ;;
                 *)
@@ -149,21 +148,20 @@ sysconfig(){
                 ;;
             esac
         done
- 
 	fi
 
 	#PC'S NAME AND PASSWORD
 	color cyan "Input your hostname"
     read host
     echo $host > /etc/hostname
-    color cyan "Enter your root password"
+    color cyan "Enter your root pass"
     passwd
 
     #LOCALTIME CONFIGURATION
     color yellow "Choose your local time"
-    select localtime in `ls /usr/share/zoneinfo`;do
+    select localtime in 'ls /usr/share/zoneinfo';do
         if [ -d "/usr/share/zoneinfo/$localtime" ];then
-            select time in `ls /usr/share/zoneinfo/$localtime`;do
+            select time in 'ls /usr/share/zoneinfo/$localtime';do
                 ln -sf /usr/share/zoneinfo/$localtime/$time /etc/localtime
                 break
             done
@@ -175,11 +173,11 @@ sysconfig(){
     done
 
     #ADDING USER
-    dolor cyan "Input the user name you want to use (must be lower case)"
+    color cyan "Input the user name you want to use"
     read USER
     useradd -m -g wheel $USER
     usermod -aG root,bin,daemon,tty,disk,network,video,audio $USER
-    color cyan "Set the passwd"
+    color cyan "Set the password"
     passwd $USER
     pacman -S --noconfirm sudo
     sed -i 's/\# \%wheel ALL=(ALL) ALL/\%wheel ALL=(ALL) ALL/g' /etc/sudoers
@@ -187,66 +185,26 @@ sysconfig(){
 
     #SETUP A VIDEOGRAPHIC DRIVER
     color cyan "What is your video graphic card?"
-    select GPU in "Intel" "Nvidia" "Intel and Nvidia" "AMD";do
+    select GPU in "Intel" "Nvidia" "AMD" "driver for VirtuaBox";do
         case $GPU in
             "Intel")
                 pacman -S --noconfirm xf86-video-intel -y
                 break
             ;;
             "Nvidia")
-                color cyan "Version of nvidia-driver to install"
-                select NVIDIA in "GeForce-8 and newer" "GeForce-6/7" "Older";do
-                    case $NVIDIA in
-                        "GeForce-8 and newer")
-                            pacman -S --noconfirm nvidia -y
-                            break
-                        ;;
-                        "GeForce-6/7")
-                            pacman -S --noconfirm nvidia-304xx -y
-                            break
-                        ;;
-                        "Older")
-                            pacman -S --noconfirm nvidia-340xx -y
-                            break
-                        ;;
-                        *)
-                            color red "Error ! Please input the correct num"
-                        ;;
-                    esac
-                done
-                break
-            ;;
-            "Intel and Nvidia")
-                pacman -S --noconfirm bumblebee -y
-                systemctl enable bumblebeed
-                color cyan "Version of nvidia-driver to install"
-                select NVIDIA in "GeForce-8 and newer" "GeForce-6/7" "Older";do
-                    case $NVIDIA in
-                        "GeForce-8 and newer")
-                            pacman -S --noconfirm nvidia -y
-                            break
-                        ;;
-                        "GeForce-6/7")
-                            pacman -S --noconfirm nvidia-304xx -y
-                            break
-                        ;;
-                        "Older")
-                            pacman -S --noconfirm nvidia-340xx -y
-                            break
-                        ;;
-                        *)
-                            color red "Error ! Please input the correct num"
-                        ;;
-                    esac
-                done
+                pacman -S xf86-video-nouveau -y
                 break
             ;;
             "AMD")
                 pacman -S --noconfirm xf86-video-ati -y
                 break
             ;;
+            "driver for VirtuaBox")
+                pacman -S xf86-video-vesa -y
+                break
+            ;;
             *)
-                color red "Error ! Please input the correct num"
+                color red "Error! Please input the correct num"
             ;;
         esac
     done
@@ -254,26 +212,51 @@ sysconfig(){
 }
 
 postinstall(){
-	color cyan "test"
-	arch-chroot /mnt /bin/bash
-	pacman -Syy
-	pacman -Su
-	pacman -S sudo
-	sudo pacman -S xorg-server xorg-xinit xorg-apps mesa-libgl xterm
+	color cyan "a bit more..."
+	arch-chroot /mnt pacman -Syy
+	arch-chroot /mnt pacman -Su
+	arch-chroot /mnt pacman -S 
+	arch-chroot /mnt sudo pacman -S xorg-server xorg-xinit xorg-apps mesa-libgl xterm
 	color cyan "Install XFCE4? y/n"
     read xfce
     if [ "$xfce" == y ];then
-    			pacman -S xfce4 xfce4-goodies lightdm lightdm-gtk-greeter
-                lightdm_config
-                gpasswd -a $USER lightdm
-    			systemctl enable lightdm
+    			pacman -S xfce4 xfce4-goodies sddm
+                arch-chroot /mnt systemctl enable sddm.service
     fi
-     pacman -Sy
-        pacman -S --noconfirm archlinuxcn-keyring
-        pacman -S --noconfirm yaourt
-    sudo pacman -S ttf-liberation ttf-dejavu opendesktop-fonts ttf-bitstream-vera ttf-arphic-ukai ttf-arphic-uming ttf-hanazono
-    color green "Installation complete. Now run the command"
-    color cyan "sudo systemctl reboot"
+    arch-chroot /mnt pacman -Sy
+    arch-chroot /mnt pacman -S --noconfirm archlinuxcn-keyring
+    arch-chroot /mnt pacman -S --noconfirm yaourt
+    arch-chroot /mnt sudo pacman -S ttf-liberation ttf-dejavu opendesktop-fonts ttf-bitstream-vera ttf-arphic-ukai ttf-arphic-uming ttf-hanazono
+ color cyan "thx for using    .88888888:."
+ color cyan "my script       88888888.88888."
+ color cyan "<3            .8888888888888888."
+ color cyan "              888888888888888888"
+ color cyan "              88' _'88'_  '88888"
+ color cyan "              88 88 88 88  88888"
+ color cyan "              88_88_::_88_:88888"
+ color cyan "              88:::,::,:::::8888"
+ color cyan "              88':::::::::''8888"
+ color cyan "             .88  '::::'    8:88."
+ color cyan "            8888            '8:888."
+ color cyan "          .8888'             '888888."
+ color cyan "         .8888:..  .::.  ...:'8888888:."
+ color cyan "        .8888.'     :'     ''::'88:88888"
+ color cyan "       .8888        '         '.888:8888."
+ color cyan "      888:8         .           888:88888"
+ color cyan "    .888:88        .:           888:88888:"
+ color cyan "    8888888.       ::           88:888888"
+ color cyan "   '.::.888.      ::          .88888888"
+ color cyan "  .::::::.888.    ::         :::'8888'.:."
+ color cyan " ::::::::::.888   '         .::::::::::::"
+ color cyan " ::::::::::::.8    '      .:8::::::::::::."
+ color cyan ".::::::::::::::.        .:888:::::::::::::"
+ color cyan " :::::::::::::::88:.__..:88888:::::::::::'"
+ color cyan "  ''.:::::::::::88888888888.88:::::::::'"
+ color cyan "        '':::_:' -- '' -'-' '':_::::''"
+ color green   "Installation complete. Now run the command"
+ color default "sudo systemctl reboot"
+ color default "--------------------------------------------"
+ color cyan "if you have any errors, write here: https://github.com/h3xb0y/arch-install/issues"
 }
 
 preinstall
