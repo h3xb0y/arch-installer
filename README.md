@@ -1,6 +1,6 @@
 <img src="https://github.com/h3xb0y/arch-installer/blob/master/img/logo%20xd.png" width="640">
 
-[![author](https://img.shields.io/badge/author-h3xb0y-red.svg)](https://github.com/h3xb0y
+[![author](https://img.shields.io/badge/author-h3xb0y-red.svg)](https://github.com/h3xb0y)
 [![license](https://img.shields.io/github/license/h3xb0y/arch-installer.svg)](https://github.com/h3xb0y/arch-installer/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/h3xb0y/arch-installer.svg?branch=master)](https://travis-ci.org/h3xb0y/arch-installer)
 
