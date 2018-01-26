@@ -11,7 +11,7 @@ Download latest version of [ArchLinux](https://www.archlinux.org/download/)<br/>
 Boot on the USB bootable device<br/>
 Run commands:<br/>
 ```
-wget https://github.com/h3xb0y/arch-installer/blob/master/install.sh
+wget https://raw.githubusercontent.com/h3xb0y/arch-installer/master/install.sh
 chmod +x install.sh
 ./install.sh
 ```
