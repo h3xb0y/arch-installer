@@ -47,6 +47,7 @@ preinstall(){
 	color deepblue "https://github.com/h3xb0y/arch-install" >&2
 	color bold "Press ENTER to skip..."
 	read startinstall
+	unset startinstall 
 	clear
 	color deepblue "Before installation u must to create 4 partritions:"
 	color deepblue "1) boot(100m)"
@@ -55,6 +56,7 @@ preinstall(){
 	color deepblue "4) home"
 	color bold "Press ENTER to start installation..."
 	read startinstall
+	unset startinstall
 	clear
     fdisk -l
     color default "Add the partrition? \e[32my\e[39m/\e[31mn"    
@@ -81,25 +83,25 @@ preinstall(){
             case $type in
                 "boot")
                 	umount $BOOT > /dev/null 2>&1
-        			mkfs.ext2 $BOOT -L boot
+        		mkfs.ext2 $BOOT -L boot
                 ;;
                 "swap")
-                    umount $SWAP > /dev/null 2>&1
-        			mkswap $SWAP -L swap
+                    	umount $SWAP > /dev/null 2>&1
+        		mkswap $SWAP -L swap
                 ;;
                 "root")
-                    umount $ROOT > /dev/null 2>&1
-        			mkfs.ext4 $ROOT -L root
+                    	umount $ROOT > /dev/null 2>&1
+        		mkfs.ext4 $ROOT -L root
                 ;;
                 "home")
-                    umount $HOME > /dev/null 2>&1
-        			mkfs.ext4 $HOME -L home
+                    	umount $HOME > /dev/null 2>&1
+        		mkfs.ext4 $HOME -L home
                 ;;
                 "start installation")
-                    break
+                    	break
                 ;;
                 *)
-                    color red "Error! Input a valid command..."
+                    	color red "Error! Input a valid command..."
                 ;;
             esac
         done
@@ -129,19 +131,20 @@ sysconfig(){
     select type in "BIOS" "EFI";do
             case $type in
                 "BIOS")	   
-					color deepblue "installing grub package..."
-					pacman -S --noconfirm grub
-					grub-install --root-directory=/mnt /dev/sda
+				color deepblue "installing grub package..."
+				pacman -S --noconfirm grub
+				grub-install --root-directory=/mnt /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
+				break
                 ;;
                 "EFI")
-					color deepblue "installing grub package..."
-                   	pacman -S --noconfirm grub efibootmgr -y
+				color deepblue "installing grub package..."
+                   		pacman -S --noconfirm grub efibootmgr -y
         			grub-install --target='uname -m'-efi --efi-directory=/boot --bootloader-id=Arch
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
         			mkdir /mnt/boot/EFI/boot
         			cp /mnt/boot/EFI/arch_grub/grubx64.efi /mnt/boot/EFI/boot/bootx64.efi
-                    break
+                   		break
                 ;;
                 *)
                     color red "Error! Input a valid command..."
@@ -161,7 +164,7 @@ sysconfig(){
     color yellow "Choose your local time"
     select localtime in 'ls /usr/share/zoneinfo';do
         if [ -d "/usr/share/zoneinfo/$localtime" ];then
-            select time in 'ls /usr/share/zoneinfo/$localtime';do
+            select time in "ls /usr/share/zoneinfo/$localtime";do
                 ln -sf /usr/share/zoneinfo/$localtime/$time /etc/localtime
                 break
             done
