@@ -47,7 +47,7 @@ preinstall(){
 	color deepblue "https://github.com/h3xb0y/arch-install" >&2
 	color bold "Press ENTER to skip..."
 	read startinstall
-	unset startinstall 
+	echo "$startinstall"
 	clear
 	color deepblue "Before installation u must to create 4 partritions:"
 	color deepblue "1) boot(100m)"
@@ -56,7 +56,7 @@ preinstall(){
 	color deepblue "4) home"
 	color bold "Press ENTER to start installation..."
 	read startinstall
-	unset startinstall
+	echo "$startinstall"
 	clear
     fdisk -l
     color default "Add the partrition? \e[32my\e[39m/\e[31mn"    
