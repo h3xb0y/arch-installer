@@ -4,6 +4,7 @@
 [![author](https://img.shields.io/badge/author-h3xb0y-red.svg)](https://github.com/h3xb0y)
 [![license](https://img.shields.io/github/license/h3xb0y/arch-installer.svg)](https://github.com/h3xb0y/arch-installer/blob/master/LICENSE)
 [![Build Status](https://travis-ci.org/h3xb0y/arch-installer.svg?branch=master)](https://travis-ci.org/h3xb0y/arch-installer)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/91f6049d793e4788bc8b84260228a229)](https://www.codacy.com/app/qommentator/arch-installer?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=h3xb0y/arch-installer&amp;utm_campaign=Badge_Grade)
 
 This is a simple script that will simplify the installation of Arch Linux. The script (by user's permission) will install grub and other packages necessary for work.
 
