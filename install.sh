@@ -47,7 +47,7 @@ preinstall(){
 	color deepblue "https://github.com/h3xb0y/arch-install" >&2
 	color bold "Press ENTER to skip..."
 	read startinstall
-	echo "$startinstall"
+    echo "$startinstall"
 	clear
 	color deepblue "Before installation u must to create 4 partritions:"
 	color deepblue "1) boot(100m)"
@@ -56,10 +56,10 @@ preinstall(){
 	color deepblue "4) home"
 	color bold "Press ENTER to start installation..."
 	read startinstall
-	echo "$startinstall"
+    echo "$startinstall"
 	clear
     fdisk -l
-    color default "Add the partrition? \e[32my\e[39m/\e[31mn"    
+    color default "Add the partrition? y/n"    
     read answ
     if [ "$answ" == y ];then
         color default "Okay, now input the disk \e[32m/dev/sdX"
@@ -70,7 +70,7 @@ preinstall(){
     color bold "BOOT mount point:"
     read BOOT
     #swap
-    color bold "SWAP:"
+    color bold "SWAP mount point:"
     read SWAP
     #root
     color bold "ROOT mount point:"
@@ -79,29 +79,39 @@ preinstall(){
     color bold "HOME mount point:"
     read HOME
     color default "Enter partrition to format:"
-    select type in "boot" "swap" "root" "home" "start installation";do
+    select type in "boot" "swap" "root" "home" "format all" "start installation";do
             case $type in
                 "boot")
                 	umount $BOOT > /dev/null 2>&1
-        		mkfs.ext2 $BOOT -L boot
+        			mkfs.ext2 $BOOT -L boot
                 ;;
                 "swap")
-                    	umount $SWAP > /dev/null 2>&1
-        		mkswap $SWAP -L swap
+                    umount $SWAP > /dev/null 2>&1
+        			mkswap $SWAP -L swap
                 ;;
                 "root")
-                    	umount $ROOT > /dev/null 2>&1
-        		mkfs.ext4 $ROOT -L root
+                    umount $ROOT > /dev/null 2>&1
+        			mkfs.ext4 $ROOT -L root
                 ;;
                 "home")
-                    	umount $HOME > /dev/null 2>&1
-        		mkfs.ext4 $HOME -L home
+                    umount $HOME > /dev/null 2>&1
+        			mkfs.ext4 $HOME -L home
+                ;;
+                "format all")
+                    umount $BOOT > /dev/null 2>&1
+                    mkfs.ext2 $BOOT -L boot
+                    umount $SWAP > /dev/null 2>&1
+                    mkswap $SWAP -L swap
+                    umount $ROOT > /dev/null 2>&1
+                    mkfs.ext4 $ROOT -L root
+                    umount $HOME > /dev/null 2>&1
+                    mkfs.ext4 $HOME -L home
                 ;;
                 "start installation")
-                    	break
+                    break
                 ;;
                 *)
-                    	color red "Error! Input a valid command..."
+                    color red "Error! Input a valid command..."
                 ;;
             esac
         done
@@ -131,20 +141,20 @@ sysconfig(){
     select type in "BIOS" "EFI";do
             case $type in
                 "BIOS")	   
-				color deepblue "installing grub package..."
-				pacman -S --noconfirm grub
-				grub-install --root-directory=/mnt /dev/sda
+					color deepblue "installing grub package..."
+					arch-chroot /mnt pacman -S grub-bios 
+					grub-install /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
-				break
+                    break
                 ;;
                 "EFI")
-				color deepblue "installing grub package..."
-                   		pacman -S --noconfirm grub efibootmgr -y
-        			grub-install --target='uname -m'-efi --efi-directory=/boot --bootloader-id=Arch
+					color deepblue "installing grub package..."
+                   	arch-chroot /mnt pacman -S grub-efi-x86_64 
+        			grub-install /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
         			mkdir /mnt/boot/EFI/boot
         			cp /mnt/boot/EFI/arch_grub/grubx64.efi /mnt/boot/EFI/boot/bootx64.efi
-                   		break
+                    break
                 ;;
                 *)
                     color red "Error! Input a valid command..."
@@ -230,36 +240,36 @@ postinstall(){
     arch-chroot /mnt pacman -S --noconfirm archlinuxcn-keyring
     arch-chroot /mnt pacman -S --noconfirm yaourt
     arch-chroot /mnt sudo pacman -S ttf-liberation ttf-dejavu opendesktop-fonts ttf-bitstream-vera ttf-arphic-ukai ttf-arphic-uming ttf-hanazono
- color cyan "thx for using    .88888888:."
- color cyan "my script       88888888.88888."
- color cyan "<3            .8888888888888888."
- color cyan "              888888888888888888"
- color cyan "              88' _'88'_  '88888"
- color cyan "              88 88 88 88  88888"
- color cyan "              88_88_::_88_:88888"
- color cyan "              88:::,::,:::::8888"
- color cyan "              88':::::::::''8888"
- color cyan "             .88  '::::'    8:88."
- color cyan "            8888            '8:888."
- color cyan "          .8888'             '888888."
- color cyan "         .8888:..  .::.  ...:'8888888:."
- color cyan "        .8888.'     :'     ''::'88:88888"
- color cyan "       .8888        '         '.888:8888."
- color cyan "      888:8         .           888:88888"
- color cyan "    .888:88        .:           888:88888:"
- color cyan "    8888888.       ::           88:888888"
- color cyan "   '.::.888.      ::          .88888888"
- color cyan "  .::::::.888.    ::         :::'8888'.:."
- color cyan " ::::::::::.888   '         .::::::::::::"
- color cyan " ::::::::::::.8    '      .:8::::::::::::."
- color cyan ".::::::::::::::.        .:888:::::::::::::"
- color cyan " :::::::::::::::88:.__..:88888:::::::::::'"
- color cyan "  ''.:::::::::::88888888888.88:::::::::'"
- color cyan "        '':::_:' -- '' -'-' '':_::::''"
- color green   "Installation complete. Now run the command"
- color default "sudo systemctl reboot"
- color default "--------------------------------------------"
- color cyan "if you have any errors, write here: https://github.com/h3xb0y/arch-install/issues"
+    color cyan "thx for using    .88888888:."
+    color cyan "my script       88888888.88888."
+    color cyan "<3            .8888888888888888."
+    color cyan "              888888888888888888"
+    color cyan "              88' _'88'_  '88888"
+    color cyan "              88 88 88 88  88888"
+    color cyan "              88_88_::_88_:88888"
+    color cyan "              88:::,::,:::::8888"
+    color cyan "              88':::::::::''8888"
+    color cyan "             .88  '::::'    8:88."
+    color cyan "            8888            '8:888."
+    color cyan "          .8888'             '888888."
+    color cyan "         .8888:..  .::.  ...:'8888888:."
+    color cyan "        .8888.'     :'     ''::'88:88888"
+    color cyan "       .8888        '         '.888:8888."
+    color cyan "      888:8         .           888:88888"
+    color cyan "    .888:88        .:           888:88888:"
+    color cyan "    8888888.       ::           88:888888"
+    color cyan "   '.::.888.      ::          .88888888"
+    color cyan "  .::::::.888.    ::         :::'8888'.:."
+    color cyan " ::::::::::.888   '         .::::::::::::"
+    color cyan " ::::::::::::.8    '      .:8::::::::::::."
+    color cyan ".::::::::::::::.        .:888:::::::::::::"
+    color cyan " :::::::::::::::88:.__..:88888:::::::::::'"
+    color cyan "  ''.:::::::::::88888888888.88:::::::::'"
+    color cyan "        '':::_:' -- '' -'-' '':_::::''"
+    color green   "Installation complete. Now run the command"
+    color default "sudo systemctl reboot"
+    color default "----------------------------------------------------------------------"
+    color cyan "if you have any errors or offers, write here: https://github.com/h3xb0y/arch-installer/issues"
 }
 
 preinstall
