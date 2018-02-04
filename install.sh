@@ -227,6 +227,8 @@ sysconfig(){
 
 postinstall(){
 	color cyan "a bit more..."
+	genfstab -p /mnt >> /mnt/etc/fstab
+	arch-chroot /mnt mkinitcpio -p linux
 	arch-chroot /mnt pacman -Syy
 	arch-chroot /mnt pacman -Su
 	arch-chroot /mnt pacman -S 
