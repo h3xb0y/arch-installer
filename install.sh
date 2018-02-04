@@ -149,7 +149,7 @@ sysconfig(){
                     break
                 ;;
                 "EFI")
-					color deepblue "installing grub package..."
+				color deepblue "installing grub package..."
                    	arch-chroot /mnt pacman -S grub-efi-x86_64 
         			grub-install /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
@@ -234,7 +234,7 @@ postinstall(){
 	color cyan "Install XFCE4? y/n"
     read xfce
     if [ "$xfce" == y ];then
-    			pacman -S xfce4 xfce4-goodies sddm
+    		arch-chroot /mnt pacman -S xfce4 xfce4-goodies sddm
                 arch-chroot /mnt systemctl enable sddm.service
     fi
     arch-chroot /mnt pacman -Sy
