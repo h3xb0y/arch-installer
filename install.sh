@@ -133,6 +133,7 @@ install(){
 }
 
 sysconfig(){
+    genfstab -p /mnt >> /mnt/etc/fstab
 	pacman -Syy
 	#INSTALLING GRUB PACKAGE
 	color cyan "Install GRUB? y/n"
@@ -174,8 +175,8 @@ sysconfig(){
     #LOCALTIME CONFIGURATION
     color yellow "Choose your local time"
     select localtime in 'ls /usr/share/zoneinfo';do
-        if [ -d "/usr/share/zoneinfo/$localtime" ];then
-            select time in "ls /usr/share/zoneinfo/$localtime";do
+        if [ -d '/usr/share/zoneinfo/$localtime' ];then
+            select time in 'ls /usr/share/zoneinfo/$localtime';do
                 ln -sf /usr/share/zoneinfo/$localtime/$time /etc/localtime
                 break
             done
@@ -227,7 +228,6 @@ sysconfig(){
 
 postinstall(){
 	color cyan "a bit more..."
-	genfstab -p /mnt >> /mnt/etc/fstab
 	arch-chroot /mnt mkinitcpio -p linux
 	arch-chroot /mnt pacman -Syy
 	arch-chroot /mnt pacman -Su
@@ -237,12 +237,13 @@ postinstall(){
     read xfce
     if [ "$xfce" == y ];then
     		arch-chroot /mnt pacman -S xfce4 xfce4-goodies sddm
-                arch-chroot /mnt systemctl enable sddm.service
+            arch-chroot /mnt systemctl enable sddm.service
     fi
     arch-chroot /mnt pacman -Sy
     arch-chroot /mnt pacman -S --noconfirm archlinuxcn-keyring
     arch-chroot /mnt pacman -S --noconfirm yaourt
     arch-chroot /mnt sudo pacman -S ttf-liberation ttf-dejavu opendesktop-fonts ttf-bitstream-vera ttf-arphic-ukai ttf-arphic-uming ttf-hanazono
+    arch-chroot /mnt systemctl enable dhcpcd
     color cyan "thx for using    .88888888:."
     color cyan "my script       88888888.88888."
     color cyan "<3            .8888888888888888."
