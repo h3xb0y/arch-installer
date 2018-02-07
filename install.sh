@@ -23,6 +23,12 @@ color(){
     esac
 }
 preinstall(){
+	cd configs
+	loadkeys ru
+	setfont cyr-sun16
+	cp -v locale.gen /etc/
+	locale-gen
+	export LANG=ru_RU.UTF-8
 	echo -e "" >&2
 	color cyan "	              -'" >&2
 	color cyan "                 .o+'" >&2
