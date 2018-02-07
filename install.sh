@@ -29,6 +29,7 @@ preinstall(){
 	cp -v locale.gen /etc/
 	locale-gen
 	export LANG=ru_RU.UTF-8
+	color cyan "Тест"
 	echo -e "" >&2
 	color cyan "	              -'" >&2
 	color cyan "                 .o+'" >&2
