@@ -24,9 +24,8 @@ color(){
 }
 preinstall(){
 	loadkeys ru
-	setfont cyr-sun16
-	locale-gen
 	export LANG=ru_RU.UTF-8
+	locale-gen
 	color cyan "Тест.АаБбВвГгДд"
 	echo -e "" >&2
 	color cyan "	              -'" >&2
