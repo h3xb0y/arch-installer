@@ -148,14 +148,14 @@ sysconfig(){
             case $type in
                 "BIOS")	   
 					color deepblue "installing grub package..."
-					arch-chroot /mnt pacman -S grub-bios 
+					arch-chroot /mnt pacman -S --noconfirm grub-bios 
 					arch-chroot /mnt grub-install /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
                     break
                 ;;
                 "EFI")
 				color deepblue "installing grub package..."
-                   	arch-chroot /mnt pacman -S grub-efi-x86_64 
+                   		arch-chroot /mnt pacman -S --noconfirm grub-efi-x86_64 
         			grub-install /dev/sda
         			arch-chroot /mnt grub-mkconfig -o /boot/grub/grub.cfg
         			mkdir /mnt/boot/EFI/boot
@@ -211,7 +211,7 @@ sysconfig(){
                 break
             ;;
             "Nvidia")
-                pacman -S xf86-video-nouveau -y
+                pacman -S --noconfirm xf86-video-nouveau -y
                 break
             ;;
             "AMD")
@@ -219,7 +219,7 @@ sysconfig(){
                 break
             ;;
             "driver for VirtuaBox")
-                pacman -S xf86-video-vesa -y
+                pacman -S --noconfirm xf86-video-vesa -y
                 break
             ;;
             *)
@@ -236,7 +236,7 @@ postinstall(){
 	arch-chroot /mnt pacman -Syy
 	arch-chroot /mnt pacman -Su
 	arch-chroot /mnt pacman -S 
-	arch-chroot /mnt sudo pacman -S xorg-server xorg-xinit xorg-apps mesa-libgl xterm
+	arch-chroot /mnt sudo pacman -S --noconfirm xorg-server xorg-xinit xorg-apps mesa-libgl xterm
 	color cyan "Install XFCE4? y/n"
     read xfce
     if [ "$xfce" == y ];then
